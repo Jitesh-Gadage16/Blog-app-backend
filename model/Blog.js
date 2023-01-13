@@ -5,7 +5,15 @@ const blogSchema = new mongoose.Schema({
         type: String,
         default: null
     },
-    userid:{
+    discription:{
+        type: String,
+        default: null
+    },
+    blogimg:{
+        type: String,
+        default: null
+    },
+    user:{
         type: mongoose.Schema.Types.ObjectId,
         ref:'user'
     },
@@ -22,7 +30,11 @@ const blogSchema = new mongoose.Schema({
         default: Date.now
     },
    
-})
+},
+{
+    timestamps:true
+}
+)
 
 module.exports = mongoose.model("blog", blogSchema)
 
