@@ -13,6 +13,10 @@ const blogSchema = new mongoose.Schema({
         type: String,
         default: null
     },
+    userDetails:{
+        type:Object,
+        default: null
+    },
     user:{
         type: mongoose.Schema.Types.ObjectId,
         ref:'user'

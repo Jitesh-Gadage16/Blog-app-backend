@@ -152,15 +152,15 @@ app.post('/createCategory', auth, async (req, res) => {
     }
 })
 
-app.get('/getCategory', auth, async (req, res) => {
+app.get('/getCategory', async (req, res) => {
 
     try {
-        const user = req.user.id
-        console.log("user detail", user)
+        // const user = req.user.id
+        // console.log("user detail", user)
 
-        if (!user) {
-            res.status(401).send("user not found and you are not allowed")
-        }
+        // if (!user) {
+        //     res.status(401).send("user not found and you are not allowed")
+        // }
 
         const getCategories = await Category.find();
 
@@ -251,7 +251,7 @@ app.get('/getAllbogs', auth, async (req, res) => {
     }
 })
 
-app.get('/getBlog', auth, async (req, res) => {
+app.get('/getBlog',  async (req, res) => {
     const categoryId = req.query.categoryId;
 
     try {
@@ -282,6 +282,7 @@ app.get('/getBlog', auth, async (req, res) => {
         res.status(200).json({
             success: true,
             message: "successfully blog created",
+            categoryId,
             checkBlogexist
         })
 
@@ -290,17 +291,17 @@ app.get('/getBlog', auth, async (req, res) => {
     }
 })
 
-
-app.post("/createblog", uploader.single("file"), auth, async (req, res) => {
+   
+app.post("/createblog", uploader.single("file"), auth,  async (req, res) => {
 
     try {
         const userid = req.user.id
-        console.log("user detail", userid)
+        console.log("user detail", userid)      
 
         //check user in database
-        const user = await User.findOne({ userid })
+        const userDetails = await User.findOne({ userid })
 
-        console.log("+++", user)
+        console.log("+++", userDetails)
 
 
         const file = req.file.path
@@ -309,15 +310,15 @@ app.post("/createblog", uploader.single("file"), auth, async (req, res) => {
 
         if (!file) {
             res.status(401).send("img are required")
-        }
-
+        }    
+    
 
         const upload = await cloudinary.v2.uploader.upload(file);
 
 
         const { title,discription, categoryid, content } = req.body
 
-
+  
 
         if (!(title && discription && categoryid && content)) {
             res.status(401).send("All fileds are required")
@@ -330,8 +331,7 @@ app.post("/createblog", uploader.single("file"), auth, async (req, res) => {
             discription,
             categoryid: categoryid,
             content,       
-            user:user,   
-            user,
+            userDetails,  
             blogimg: upload.secure_url
         })
 
@@ -340,7 +340,7 @@ app.post("/createblog", uploader.single("file"), auth, async (req, res) => {
 
         return res.json({
             success: true,
-            blog
+            blog        
         });
     } catch (error) {
         console.log("error", error)
