@@ -291,6 +291,46 @@ app.get('/getBlog',  async (req, res) => {
     }
 })
 
+app.get('/getBlogbyId',  async (req, res) => {
+    const blogId = req.query.blogId;
+
+    try {
+
+        // const { category } = req.params;
+
+        console.log("Blog id  mila", blogId);
+
+
+        // const categoryid = categoryId
+
+        // console.log("dsdsds", categoryId)
+
+        const checkBlogexist = await Blog.find({_id:blogId})
+
+        console.log("blog mila ", checkBlogexist)
+
+
+
+        // if (!checkBlogexist) {
+        //     res.status(401).send("user not found and you are not allowed")
+        // }
+
+        // const getBlogs = await Blog.findById({ blogId });
+
+        // console.log(getBlogs)
+
+        res.status(200).json({
+            success: true,
+            message: "successfully blog created",
+            blogId,
+            checkBlogexist
+        })
+
+    } catch (error) {
+        console.log("erro in get blog by id", error)
+    }
+})
+
    
 app.post("/createblog", uploader.single("file"), auth,  async (req, res) => {
 
@@ -310,7 +350,7 @@ app.post("/createblog", uploader.single("file"), auth,  async (req, res) => {
 
         if (!file) {
             res.status(401).send("img are required")
-        }    
+        }      
     
 
         const upload = await cloudinary.v2.uploader.upload(file);

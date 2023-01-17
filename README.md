@@ -22,6 +22,6 @@ Backend code of Blog app
 
  **create BLog Category**  ``localhost:8080/createCategory``
 
- **create Blog**  ``localhost:8080/createblog``
+ 
 
- **Register**  ``localhost:8080/register``
+ **get All Category**  ``localhost:8080/getCategory``
