@@ -16,7 +16,7 @@ const Blog = require("./model/Blog")
 const Category = require("./model/Category")
 
 const app = express()
-app.use(cors());
+app.use(cors({credentials: true, origin: 'http://localhost:8080'}));
 app.use(express.json()) // discuss this later
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
@@ -28,7 +28,7 @@ app.get("/", (req, res) => {
 app.post("/register", async (req, res) => {
     try {
         //collect all information
-        const { firstname, lastname, email, password } = req.body
+        const { firstname, lastname, email, password } = req.body  
         // console.log({ firstname, lastname, email, password });
 
         //validate the data, if exists
@@ -81,11 +81,11 @@ app.post("/login", async (req, res) => {
 
         // console.log("++++" ,req)
         // return false  
-
+  
         //validate   
-        if (!(email && password)) {
-            res.status(401).send("email and password is required")
-        }
+        if (!(email && password)) {   
+            res.status(401).send("email and password is required")     
+        }  
 
         //check user in database
         const user = await User.findOne({ email })
@@ -96,24 +96,27 @@ app.post("/login", async (req, res) => {
         if (user && (await bcrypt.compare(password, user.password))) {
             const token = jwt.sign({ id: user._id, email }, 'shhhhh', { expiresIn: '2h' })
 
-
+   
             user.password = undefined
             user.token = token
 
-            const options = {
-                expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+            const options = {       
+                expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),         
                 httpOnly: true
             }
+          
             res.status(200).cookie("token", token, options).json({
                 success: true,
+                message: "login successfull",
+              
                 token,
                 user
             })
-            res.status(200).send("login successfull")
+            // res.status(200).send("login successfull")
 
         }
         //create token and send
-        res.sendStatus(400).send("email or password is incorrect")
+        // res.sendStatus(400).send("email or password is incorrect")    
     } catch (error) {
         console.log("error in login route", error);
     }
@@ -253,6 +256,7 @@ app.get('/getAllbogs', auth, async (req, res) => {
 
 app.get('/getBlog',  async (req, res) => {
     const categoryId = req.query.categoryId;
+    const limit =  req.query.limit
 
     try {
 
@@ -265,12 +269,12 @@ app.get('/getBlog',  async (req, res) => {
 
         console.log("dsdsds", categoryId)
 
-        const checkBlogexist = await Blog.find({ categoryid: categoryId })
+        const checkBlogexist = await Blog.find({ categoryid: categoryId }).limit(limit)               
 
         console.log("blog mila ", checkBlogexist)
 
-
-
+         
+     
         // if (!checkBlogexist) {
         //     res.status(401).send("user not found and you are not allowed")
         // }
@@ -302,8 +306,8 @@ app.get('/getBlogbyId',  async (req, res) => {
 
 
         // const categoryid = categoryId
-
-        // console.log("dsdsds", categoryId)
+  
+        // console.log("dsdsds", categoryId)       
 
         const checkBlogexist = await Blog.find({_id:blogId})
 
@@ -346,7 +350,7 @@ app.post("/createblog", uploader.single("file"), auth,  async (req, res) => {
 
         const file = req.file.path
 
-        //  console.log(file)     
+         console.log(file)          
 
         if (!file) {
             res.status(401).send("img are required")
