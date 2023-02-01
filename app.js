@@ -413,6 +413,49 @@ app.delete("/logout",  async (req, res) => {
     }
 })
 
+app.get('/toSearch',auth, async (req, res) =>{
+
+    try {
+
+        const uID = req.user.id;
+        console.log("useerr",uID);
+        const uniqueUser = await User.findOne({uID});
+console.log("ccccccc",uniqueUser)      
+        if (uniqueUser) {
+        const {search} = req.query;           
+        console.log("-->",search);    
+        if (!search) {
+          return  res.status(400).send("Please enter text to search!")
+        }                  
+    
+        const searchedTodos = await Blog.find(  {  $and :[ {userID : uID},{$or : [{"title": {$regex: search, $options:'i'}},{"discription": {$regex: search, $options:'i'}}]}]})
+                // console.log(searchedTodos);
+                if (searchedTodos.length>0) {
+                  return  res.status(200).json({
+                        success :true,
+                        searchedTodos            
+                    })
+                } else {
+                  return  res.status(200).json({
+                        success :false,
+                        message : "No such todo or task exist!"
+                    })
+                }
+       }
+   
+    } catch (error) {
+        console.log(error);
+        console.log("Failed search");
+        res.status(401).json({
+            success : false,
+            message : "Failed to search"
+        })
+    }
+   
+
+
+})
+
                
 
 
