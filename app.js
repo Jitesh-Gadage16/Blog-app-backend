@@ -79,13 +79,13 @@ app.post("/login", async (req, res) => {
         //collected information from frontend
         const { email, password } = req.body
 
-        // console.log("++++" ,req)
+        // console.log("++++" ,req)            
         // return false  
   
         //validate   
         if (!(email && password)) {   
             res.status(401).send("email and password is required")     
-        }  
+        }              
 
         //check user in database
         const user = await User.findOne({ email })
@@ -99,6 +99,7 @@ app.post("/login", async (req, res) => {
    
             user.password = undefined
             user.token = token
+            console.log(token)
 
             const options = {       
                 expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),         
@@ -111,8 +112,7 @@ app.post("/login", async (req, res) => {
               
                 token,
                 user
-            })
-            // res.status(200).send("login successfull")
+            })  
 
         }
         //create token and send
@@ -336,7 +336,7 @@ app.get('/getBlogbyId',  async (req, res) => {
 })
 
    
-app.post("/createblog", uploader.single("file"), auth,  async (req, res) => {
+app.post("/createblog", uploader.single("file"),auth, async (req, res) => {
 
     try {
         const userid = req.user.id
@@ -348,25 +348,25 @@ app.post("/createblog", uploader.single("file"), auth,  async (req, res) => {
         console.log("+++", userDetails)
 
 
-        const file = req.file.path
+        // const file = req.file.path
 
-         console.log(file)          
+        //  console.log(file)          
 
-        if (!file) {
-            res.status(401).send("img are required")
-        }      
+        // if (!file) {
+        //     res.status(401).send("img are required")
+        // }        
     
 
-        const upload = await cloudinary.v2.uploader.upload(file);
+        // const upload = await cloudinary.v2.uploader.upload(file);
 
 
-        const { title,discription, categoryid, content } = req.body
+        const { title,discription,blogimg, categoryid, content } = req.body
 
   
 
-        if (!(title && discription && categoryid && content)) {
-            res.status(401).send("All fileds are required")
-        }
+        // if (!(title && blogimg && discription && categoryid && content)) {
+        //     res.status(401).send("All fileds are required")
+        // }
 
 
 
@@ -376,25 +376,44 @@ app.post("/createblog", uploader.single("file"), auth,  async (req, res) => {
             categoryid: categoryid,
             content,       
             userDetails,  
-            blogimg: upload.secure_url
-        })
+            blogimg,
+        })   
 
         console.log(blog)
 
-
-        return res.json({
+        res.status(200).json({
             success: true,
-            blog        
-        });
+            blog      
+        })
+
+
+        // return res.json({
+        //     success: true,
+        //     blog        
+        // });
     } catch (error) {
-        console.log("error", error)
+        console.log("error in create bloh", error)
     }
-
-
+  
+   
 });
 
+app.delete("/logout",  async (req, res) => {
+    try {
+        res.cookie("token", null, {
+            expires: new Date(Date.now()),
+            httpOnly: true
+        })
+        res.status(200).json({
+            success: true,
+            message: "Logged Out"
+        })
+    } catch (error) {
+        console.log("error in logout " , error)
+    }
+})
 
-
+               
 
 
 
