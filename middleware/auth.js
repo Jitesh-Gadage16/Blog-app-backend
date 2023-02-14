@@ -11,11 +11,11 @@ const auth = (req, res, next) => {
 
     //what if token is not there  
     if (!token) {
-        return res.status(403).send('token is missing')  
+        return res.status(403).send('token is missing')               
     }   
           
     //verify token             
-    try {    
+    try {                
         const decode = jwt.verify(token, 'shhhhh')   
         console.log(decode);
         req.user = decode      

@@ -17,12 +17,12 @@ const Category = require("./model/Category")
 
 const app = express()
 app.use(cors({credentials: true, origin: 'http://localhost:8080'}));
-app.use(express.json()) // discuss this later
+app.use(express.json()) // discuss this later       
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 
-app.get("/", (req, res) => {
-    res.send("Hello auth system")
+app.get("/", (req, res) => { 
+    res.send("Hello auth system")   
 })
 
 app.post("/register", async (req, res) => {
@@ -343,12 +343,12 @@ app.post("/createblog", uploader.single("file"),auth, async (req, res) => {
         console.log("user detail", userid)      
 
         //check user in database
-        const userDetails = await User.findOne({ userid })
+        const userDetails = await User.findById(userid)      
 
         console.log("+++", userDetails)
 
 
-        // const file = req.file.path
+        // const file = req.file.path       
 
         //  console.log(file)          
 
