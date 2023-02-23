@@ -328,8 +328,7 @@ app.get('/getBlogbyId',  async (req, res) => {
             message: "successfully blog created",
             blogId,
             checkBlogexist
-        })
-
+        })        
     } catch (error) {
         console.log("erro in get blog by id", error)
     }
