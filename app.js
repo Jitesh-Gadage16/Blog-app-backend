@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken")
 const bcrypt = require("bcryptjs")
 var cookieParser = require('cookie-parser')
 const cloudinary = require("./cloudinary");
-const uploader = require("./multer");
+// const uploader = require("./multer");
 
 //custom middleware
 const auth = require('./middleware/auth')
@@ -15,20 +15,21 @@ const User = require("./model/User")
 const Blog = require("./model/Blog")
 const Category = require("./model/Category")
 
+
 const app = express()
-app.use(cors({credentials: true, origin: 'http://localhost:8080'}));
+app.use(cors({ credentials: true, origin: 'http://localhost:8080' }));
 app.use(express.json()) // discuss this later       
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 
-app.get("/", (req, res) => { 
-    res.send("Hello auth system")   
+app.get("/", (req, res) => {
+    res.send("Hello auth system")
 })
 
 app.post("/register", async (req, res) => {
     try {
         //collect all information
-        const { firstname, lastname, email, password } = req.body  
+        const { firstname, lastname, email, password } = req.body
         // console.log({ firstname, lastname, email, password });
 
         //validate the data, if exists
@@ -81,11 +82,11 @@ app.post("/login", async (req, res) => {
 
         // console.log("++++" ,req)            
         // return false  
-  
+
         //validate   
-        if (!(email && password)) {   
-            res.status(401).send("email and password is required")     
-        }              
+        if (!(email && password)) {
+            res.status(401).send("email and password is required")
+        }
 
         //check user in database
         const user = await User.findOne({ email })
@@ -96,23 +97,23 @@ app.post("/login", async (req, res) => {
         if (user && (await bcrypt.compare(password, user.password))) {
             const token = jwt.sign({ id: user._id, email }, 'shhhhh', { expiresIn: '2h' })
 
-   
+
             user.password = undefined
             user.token = token
             console.log(token)
 
-            const options = {       
-                expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),         
+            const options = {
+                expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
                 httpOnly: true
             }
-          
+
             res.status(200).cookie("token", token, options).json({
                 success: true,
                 message: "login successfull",
-              
+
                 token,
                 user
-            })  
+            })
 
         }
         //create token and send
@@ -254,9 +255,9 @@ app.get('/getAllbogs', auth, async (req, res) => {
     }
 })
 
-app.get('/getBlog',  async (req, res) => {
+app.get('/getBlog', async (req, res) => {
     const categoryId = req.query.categoryId;
-    const limit =  req.query.limit
+    const limit = req.query.limit
 
     try {
 
@@ -269,12 +270,12 @@ app.get('/getBlog',  async (req, res) => {
 
         console.log("dsdsds", categoryId)
 
-        const checkBlogexist = await Blog.find({ categoryid: categoryId }).limit(limit)               
+        const checkBlogexist = await Blog.find({ categoryid: categoryId }).limit(limit)
 
         console.log("blog mila ", checkBlogexist)
 
-         
-     
+
+
         // if (!checkBlogexist) {
         //     res.status(401).send("user not found and you are not allowed")
         // }
@@ -295,21 +296,21 @@ app.get('/getBlog',  async (req, res) => {
     }
 })
 
-app.get('/getBlogbyId',  async (req, res) => {
+app.get('/getBlogbyId', async (req, res) => {
     const blogId = req.query.blogId;
 
     try {
-
+    
         // const { category } = req.params;
 
         console.log("Blog id  mila", blogId);
 
-
+   
         // const categoryid = categoryId
-  
+
         // console.log("dsdsds", categoryId)       
 
-        const checkBlogexist = await Blog.find({_id:blogId})
+        const checkBlogexist = await Blog.find({ _id: blogId })
 
         console.log("blog mila ", checkBlogexist)
 
@@ -328,21 +329,21 @@ app.get('/getBlogbyId',  async (req, res) => {
             message: "successfully blog created",
             blogId,
             checkBlogexist
-        })        
+        })
     } catch (error) {
         console.log("erro in get blog by id", error)
     }
 })
 
-   
-app.post("/createblog", uploader.single("file"),auth, async (req, res) => {
+
+app.post("/createblog",  auth, async (req, res) => {
 
     try {
         const userid = req.user.id
-        console.log("user detail", userid)      
+        console.log("user detail", userid)    
 
         //check user in database
-        const userDetails = await User.findById(userid)      
+        const userDetails = await User.findById(userid)
 
         console.log("+++", userDetails)
 
@@ -354,14 +355,14 @@ app.post("/createblog", uploader.single("file"),auth, async (req, res) => {
         // if (!file) {
         //     res.status(401).send("img are required")
         // }        
-    
+
 
         // const upload = await cloudinary.v2.uploader.upload(file);
 
 
-        const { title,discription,blogimg, categoryid, content } = req.body
+        const { title, discription, blogimg, categoryid, content } = req.body
 
-  
+
 
         // if (!(title && blogimg && discription && categoryid && content)) {
         //     res.status(401).send("All fileds are required")
@@ -373,16 +374,16 @@ app.post("/createblog", uploader.single("file"),auth, async (req, res) => {
             title,
             discription,
             categoryid: categoryid,
-            content,       
-            userDetails,  
+            content,
+            userDetails,
             blogimg,
-        })   
+        })
 
         console.log(blog)
 
         res.status(200).json({
             success: true,
-            blog      
+            blog
         })
 
 
@@ -393,11 +394,11 @@ app.post("/createblog", uploader.single("file"),auth, async (req, res) => {
     } catch (error) {
         console.log("error in create bloh", error)
     }
-  
-   
+
+
 });
 
-app.delete("/logout",  async (req, res) => {
+app.delete("/logout", async (req, res) => {
     try {
         res.cookie("token", null, {
             expires: new Date(Date.now()),
@@ -408,54 +409,57 @@ app.delete("/logout",  async (req, res) => {
             message: "Logged Out"
         })
     } catch (error) {
-        console.log("error in logout " , error)
+        console.log("error in logout ", error)
     }
 })
 
-app.get('/toSearch',auth, async (req, res) =>{
+app.get('/toSearch', auth, async (req, res) => {
 
     try {
 
         const uID = req.user.id;
-        console.log("useerr",uID);
-        const uniqueUser = await User.findOne({uID});
-console.log("ccccccc",uniqueUser)      
+        console.log("useerr", uID);
+        const uniqueUser = await User.findOne({ uID });
+        console.log("ccccccc", uniqueUser)
         if (uniqueUser) {
-        const {search} = req.query;           
-        console.log("-->",search);    
-        if (!search) {
-          return  res.status(400).send("Please enter text to search!")
-        }                  
-    
-        const searchedTodos = await Blog.find(  {  $and :[ {userID : uID},{$or : [{"title": {$regex: search, $options:'i'}},{"discription": {$regex: search, $options:'i'}}]}]})
-                // console.log(searchedTodos);
-                if (searchedTodos.length>0) {
-                  return  res.status(200).json({
-                        success :true,
-                        searchedTodos            
-                    })
-                } else {
-                  return  res.status(200).json({
-                        success :false,
-                        message : "No such todo or task exist!"
-                    })
-                }
-       }
-   
+            const { search } = req.query;
+            console.log("-->", search);
+            if (!search) {
+                return res.status(400).send("Please enter text to search!")
+            }
+
+            const searchedTodos = await Blog.find({ $and: [{ userID: uID }, { $or: [{ "title": { $regex: search, $options: 'i' } }, { "discription": { $regex: search, $options: 'i' } }] }] })
+            // console.log(searchedTodos);
+            if (searchedTodos.length > 0) {
+                return res.status(200).json({
+                    success: true,
+                    searchedTodos
+                })
+            } else {
+                return res.status(200).json({
+                    success: false,
+                    message: "No such todo or task exist!"
+                })
+            }
+        }
+
     } catch (error) {
         console.log(error);
         console.log("Failed search");
         res.status(401).json({
-            success : false,
-            message : "Failed to search"
+            success: false,
+            message: "Failed to search"
         })
     }
-   
-
 
 })
 
-               
+
+
+   
+
+   
+
 
 
 

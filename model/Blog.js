@@ -14,13 +14,14 @@ const blogSchema = new mongoose.Schema({
         default: null
     },
     userDetails:{
-        type:Object,
+        type:Object,  
         default: null
     },
     user:{
         type: mongoose.Schema.Types.ObjectId,
         ref:'user'
     },  
+    
     categoryid:{
         type: mongoose.Schema.Types.ObjectId,
         ref:'user'
@@ -33,6 +34,7 @@ const blogSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    
    
 },
 {
